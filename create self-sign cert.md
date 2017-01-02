@@ -34,7 +34,7 @@ If you enter '.', the field will be left blank.
     Locality Name (eg, city) []:GZ
     Organization Name (eg, company) [Internet Widgits Pty Ltd]:ericsson
     Organizational Unit Name (eg, section) []:ses
-    Common Name (e.g. server FQDN or YOUR name) []:***testssl.com***
+    Common Name (e.g. server FQDN or YOUR name) []:testssl.com
     Email Address []:362625119@qq.com
 
     Please enter the following 'extra' attributes

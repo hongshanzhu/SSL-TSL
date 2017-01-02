@@ -11,7 +11,7 @@
 1.3 双向认证
 
 ## 2.制作自签名证书 ##
- [制作自签名证书](https://github.com/hongshanzhu/SSL-TSL/blob/master/create%20self-sign%20cert.txt).
+ [制作自签名证书](https://github.com/hongshanzhu/SSL-TSL/blob/master/create%20self-sign%20cert.md).
 ## 3.基于Nodejs测试证书 ##
 
 ## 4.SSL/TSL抓包分析 ##
