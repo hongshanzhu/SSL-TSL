@@ -1,2 +1,0 @@
-V	180101003526Z		01	unknown	/C=CN/ST=GD/O=ericsson/OU=ses/CN=testSsl.com/emailAddress=362625119@qq.com
-V	180101004317Z		02	unknown	/C=CN/ST=GD/O=ericsson/OU=ses/CN=myClient/emailAddress=362625119@qq.com
