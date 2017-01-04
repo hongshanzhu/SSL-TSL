@@ -55,9 +55,9 @@ If you enter '.', the field will be left blank.
 我们就有了构建客户端需要的两个文件client.key和client.crt
 
 # 9 验证证书 #
-
+    openssl s_server -CAfile ca.crt -cert server.crt -key server.key -accept 8800 -debug
     openssl s_client -connect 127.0.0.1:8000 -cert client.cet -key client.key -tls1 -CAfile ca.cert -state -showcerts
 
     结果Verify return code: 0 (ok)
     
-    openssl s_client -connect 127.0.0.1:8180 -tls1 -CAfile ca.crt -state -showcerts
+    openssl s_client -connect 127.0.0.1:8180 -tls1 -CAfile ca.crt -state -showcerts  -debug
