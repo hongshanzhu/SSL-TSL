@@ -10,13 +10,13 @@
 
 # 1.首先生成CA私钥 #
 
-    openssl genrsa -out ca.key 1024
+    openssl genrsa -des3 -out ca.key 1024
 # 2.然后用CA私钥生成自签名证书 #
     openssl req -new -x509 -days 365 -key ca.key -out ca.crt
 没有-x509参数，只是生成证书请求，加上参数生成自签名证书。
 
 # 3.生成服务器端私钥 #
-    openssl genrsa -out server.key 1024
+    openssl genrsa -des3 -out server.key 1024
 # 4.生成服务器端证书请求 #
     openssl req -new -key server.key -out server.csr
 
@@ -47,7 +47,7 @@ If you enter '.', the field will be left blank.
 我们就有了构建服务器端需要的两个文件server.key和server.crt
 
 # 6.生成客户端私钥 #
-`openssl genrsa -out client.key 1024`
+`openssl genrsa -des3 -out client.key 1024`
 # 7.生成客户端证书请求 #
     openssl req -new -key client.key -out client.csr
 # 8.用CA根证书进行签名生成客户端证书 #
