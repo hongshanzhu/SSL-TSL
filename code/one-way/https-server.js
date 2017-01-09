@@ -7,6 +7,18 @@ var options = {
 };
 
 https.createServer(options, function (req, res) {
-  res.writeHead(200);
-  res.end("hello world\n");
+  var content = "";
+  console.log(req.headers);
+  //var body = JSON.parse(req.body);
+  req.on('data', function (chunk) {
+    content += chunk;
+    console.log(JSON.parse(chunk));
+  });
+
+  req.on('end', function () {
+    res.writeHead(200, {"Content-Type": "text/plain"});
+    res.write("You've sent: " + content);
+    res.end("hello world\n");
+  });
+  
 }).listen(8180);
