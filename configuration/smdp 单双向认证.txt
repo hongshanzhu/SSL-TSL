@@ -1,0 +1,25 @@
+1.debug log
+configctrl set palFileLoggerSettings 300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,480,481
+2.https
+    1.双向认证SM-DP https configctl
+    configctrl set prsDownloadOrderURL https://localhost:15545/gsma/rsp2/es2plus/downloadOrder
+    configctrl set prsConfirmOrderURL https://localhost:15545/gsma/rsp2/es2plus/confirmOrder
+    configctrl set prsCancelOrderURL https://localhost:15545/gsma/rsp2/es2plus/cancelOrder
+    configctrl set prsClientCertificateKeyForSMDPServer ses_client_nopass.key
+    configctrl set prsClientCertificateForSMDPServer ses_client.cer
+    configctrl set palSslCaFile /opt/miep/certs/origin_server_ssl/ca_root/ca.pem
+    configctrl set palSslCaPath /opt/miep/certs/origin_server_ssl/ca_root
+    configctrl set htsHttpClientCertificateStorage /opt/miep/certs/origin_server_ssl/client_cert
+
+    2.单向认证SM-DP https configctl
+    configctrl set prsDownloadOrderURL https://localhost:15545/gsma/rsp2/es2plus/downloadOrder
+    configctrl set prsConfirmOrderURL https://localhost:15545/gsma/rsp2/es2plus/confirmOrder
+    configctrl set prsCancelOrderURL https://localhost:15545/gsma/rsp2/es2plus/cancelOrder
+    configctrl set prsClientCertificateKeyForSMDPServer 
+    configctrl set prsClientCertificateForSMDPServer 
+    configctrl set palSslCaFile /opt/miep/certs/origin_server_ssl/ca_root/ca.pem
+    configctrl set palSslCaPath /opt/miep/certs/origin_server_ssl/ca_root
+    configctrl set htsHttpClientCertificateStorage /opt/miep/certs/origin_server_ssl/client_cert
+3 curl
+3.1 esim
+curl -i -X POST -H Accept:application/json -H x-esim-protocol-version:1.0 -H Content-Type:application/json  --user root:wapwap12 -d '{"primary-imsi":"400139001820003","primary-msisdn":"60013900182003","required-action":1,"eid":"ts182_Ipad_eid","imei":"ts182_Ipad_imei","meid":"ts182_Ipad_meid","device-type":"Ipad","display-name":"testIpad","profile-type":"iccid_profile_type","selected-plan-id":"p300"}' 'http://10.175.179.91:5550/esimservice/v1.0/activateEsimSubscription'

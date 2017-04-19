@@ -1,0 +1,116 @@
+单向认证：
+1.生成CA的自签名证书
+openssl req -new -x509 -days 365 -keyout ca.key -out ca.crt
+生成pem文件：cat ca.crt ca.key > ca.pem
+
+
+TestServer4:/var/tmp/att_simulators/caca # openssl req -new -x509 -days 365 -keyout ca.key -out ca.crt
+Generating a 1024 bit RSA private key
+.........................................................++++++
+...++++++
+writing new private key to 'ca.key'
+Enter PEM pass phrase: 123456
+Verifying - Enter PEM pass phrase: 123456
+-----
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:CN
+State or Province Name (full name) [Some-State]:GD    
+Locality Name (eg, city) []:GZ
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:ericsson
+Organizational Unit Name (eg, section) []:ses
+Common Name (eg, YOUR name) []:ca  
+Email Address []:yang.s.shen@ericsson.com
+2.    生成server端证书
+1)    生成服务端CSR
+   
+
+   openssl genrsa -des3  -out ses_server.key 1024
+
+TestServer4:/var/tmp/att_simulators/caca # openssl genrsa -des3  -out ses_server.key 1024
+Generating RSA private key, 1024 bit long modulus
+.......................++++++
+....++++++
+e is 65537 (0x10001)
+Enter pass phrase for ses_server.key:  wapwap12
+Verifying - Enter pass phrase for ses_server.key:
+
+   openssl req -new -key ses_server.key  -days 365 -out ses_server.csr 
+
+TestServer4:/var/tmp/att_simulators/caca # openssl req -new -key ses_server.key  -days 365 -out ses_server.csr 
+Enter pass phrase for ses_server.key:
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:CN
+State or Province Name (full name) [Some-State]:GD
+Locality Name (eg, city) []:GZ
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:ericsson
+Organizational Unit Name (eg, section) []:ses
+Common Name (eg, YOUR name) []:localhost
+Email Address []:yang.s.shen@ericsson.com
+
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:
+An optional company name []:
+
+2)    用CA私钥进行签名
+openssl ca -in ses_server.csr -out ses_server.crt -cert ca.crt -keyfile ca.key -notext 
+
+3) openssl rsa -in ses_server.key -out ses_server_nopass.key
+4) openssl x509 -in ses_server.crt -out ses_server.cer
+
+4.    生成client端证书
+1)    生成客户端CSR
+   
+
+   openssl genrsa -des3  -out ses_client.key 1024
+
+TestServer4:/var/tmp/att_simulators/caca # openssl genrsa -des3  -out ses_client.key 1024
+Generating RSA private key, 1024 bit long modulus
+.......................++++++
+....++++++
+e is 65537 (0x10001)
+Enter pass phrase for ses_client.key:  wapwap12
+Verifying - Enter pass phrase for ses_client.key:
+
+   openssl req -new -key ses_client.key  -days 365 -out ses_client.csr 
+
+TestServer4:/var/tmp/att_simulators/caca # openssl req -new -key ses_client.key  -days 365 -out ses_client.csr 
+Enter pass phrase for ses_client.key:
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:CN
+State or Province Name (full name) [Some-State]:GD
+Locality Name (eg, city) []:GZ
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:ericsson
+Organizational Unit Name (eg, section) []:ses
+Common Name (eg, YOUR name) []:ses
+Email Address []:yang.s.shen@ericsson.com
+
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:
+An optional company name []:
+
+2)    用CA私钥进行签名
+openssl ca -in ses_client.csr -out ses_client.crt -cert ca.crt -keyfile ca.key -notext 
+
+3) openssl rsa -in ses_client.key -out ses_client_nopass.key
+4) openssl x509 -in ses_client.crt -out ses_client.cer
+

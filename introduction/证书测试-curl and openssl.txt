@@ -1,0 +1,49 @@
+openssl s_client -msg -connect 10.175.179.94:15542 -key ./ses_client.key -cert ./ses_client.cer -CApath ./ -CAfile ./ca.pem
+
+curl -i -X POST -d '{req:validateDeviceInfo}' https://10.175.179.94:15542/hongshan/validateDeviceInfo -v --key ses_client_nopass.key --cert ses_client.cer --capath ./ --cacert ca.pem
+* About to connect() to 10.175.179.94 port 15542 (#0)
+*   Trying 10.175.179.94... connected
+* Connected to 10.175.179.94 (10.175.179.94) port 15542 (#0)
+* successfully set certificate verify locations:
+*   CAfile: ca.pem
+  CApath: ./
+* SSLv3, TLS handshake, Client hello (1):
+* SSLv3, TLS handshake, Server hello (2):
+* SSLv3, TLS handshake, CERT (11):
+* SSLv3, TLS handshake, Server key exchange (12):
+* SSLv3, TLS handshake, Request CERT (13):
+* SSLv3, TLS handshake, Server finished (14):
+* SSLv3, TLS handshake, CERT (11):
+* SSLv3, TLS handshake, Client key exchange (16):
+* SSLv3, TLS handshake, CERT verify (15):
+* SSLv3, TLS change cipher, Client hello (1):
+* SSLv3, TLS handshake, Finished (20):
+* SSLv3, TLS change cipher, Client hello (1):
+* SSLv3, TLS handshake, Finished (20):
+* SSL connection using EDH-RSA-DES-CBC3-SHA
+* Server certificate:
+* 	 subject: C=CN; ST=GD; O=ericsson; OU=ses; CN=10.175.179.94
+* 	 start date: 2016-06-16 02:51:24 GMT
+* 	 expire date: 2017-06-16 02:51:24 GMT
+* 	 common name: 10.175.179.94 (matched)
+* 	 issuer: C=CN; ST=GD; L=GZ; O=ericsson; OU=ses; CN=ca; emailAddress=hongshan.zhu@ericsson.com
+* 	 SSL certificate verify ok.
+> POST /hongshan/validateDeviceInfo HTTP/1.1
+> User-Agent: curl/7.19.7 (x86_64-suse-linux-gnu) libcurl/7.19.7 OpenSSL/0.9.8j zlib/1.2.7 libidn/1.10
+> Host: 10.175.179.94:15542
+> Accept: */*
+> Content-Length: 24
+> Content-Type: application/x-www-form-urlencoded
+> 
+< HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+< Content-Length: 1161
+Content-Length: 1161
+< Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=UTF-8
+
+< 
+<soapenv:Envelope xmlns:v1="http://www.ee.co.uk/external/apple/service/AppleSim/AppleSimResponse/v1" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><soapenv:Header/><soapenv:Body><v1:validateDeviceInfoResponse><message><!--Optional:--><notifications><!--1 or more repetitions:--><notification><code>validete_device_info_sucess</code><description>validate device info sucess</description></notification></notifications><!--Optional:--><imei>990000361082411</imei><!--Optional:--><meid>99000036108241</meid><csn>59010002000234f090bf7aca9dba826b</csn><!--Optional:--><serialNumber>1111</serialNumber><shouldRequireIccid>false</shouldRequireIccid><!--You have a CHOICE of the next 2 items at this level--><iccidPairing><!--1 or more repetitions:--><iccidPair><iccid>ts182_Ipad_iccid_old_2</iccid><!--Optional:--><pin>11</pin><iccidState>BOUND</iccidState><shouldRequireBind>false</shouldRequireBind></iccidPair><iccidPair><iccid>ts182_Ipad_iccid_old_3</iccid><pin>11</pin><iccidState>RESERVED</iccidState><shouldRequireBind>false</shouldRequireBind></iccidPair></iccidPairing></message></v1:validateDeviceInfoResponse></soapenv:Body></soapenv:Envelope>
+* Connection #0 to host 10.175.179.94 left intact
+* Closing connection #0
+* SSLv3, TLS alert, Client hello (1):

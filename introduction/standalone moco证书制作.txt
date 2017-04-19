@@ -1,0 +1,214 @@
+1.    准备 Testserver4 /var/tmp/目录下
+1)    在目录下新建目录 demoCA、demoCA/certs、demoCA/certs  、 demoCA/newcerts
+2)    在demoCA建立一个空文件 index.txt
+3)    在demoCA建立一个文本文件 serial, 没有扩展名，内容是一个合法的16进制数字，例如 0000
+4)    export PATH=$PATH:/usr/java/default/bin/
+
+
+2.    生成CA的自签名证书
+openssl req -new -x509 -days 365 -keyout ca.key -out ca.crt
+生成pem文件：cat ca.crt ca.key > ca.pem
+
+
+TestServer4:/var/tmp/att_simulators/caca # openssl req -new -x509 -days 365 -keyout ca.key -out ca.crt
+Generating a 1024 bit RSA private key
+.........................................................++++++
+...++++++
+writing new private key to 'ca.key'
+Enter PEM pass phrase: 123456
+Verifying - Enter PEM pass phrase: 123456
+-----
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:CN
+State or Province Name (full name) [Some-State]:GD    
+Locality Name (eg, city) []:GZ
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:ericsson
+Organizational Unit Name (eg, section) []:ses
+Common Name (eg, YOUR name) []:ca  
+Email Address []:yang.s.shen@ericsson.com
+
+
+
+
+3.    生成server端证书
+1)    生成KeyPair生成密钥对
+ keytool -genkey -alias esimproxy_server -validity 365 -keyalg RSA -keysize 1024 -storepass 123456 -keystore esimproxy_keystore.jks
+  输入common name时，要和服务器的域名保持一致。
+
+TestServer4:/var/tmp/att_simulators/caca # keytool -genkey -alias esimproxy_server -validity 365 -keyalg RSA -keysize 1024 -storepass 123456 -keystore esimproxy_keystore.jks
+What is your first and last name?
+  [Unknown]:  10.175.179.94
+What is the name of your organizational unit?
+  [Unknown]:  ses
+What is the name of your organization?
+  [Unknown]:  ericsson
+What is the name of your City or Locality?
+  [Unknown]:  GZ
+What is the name of your State or Province?
+  [Unknown]:  GD
+What is the two-letter country code for this unit?
+  [Unknown]:  CN
+Is CN=10.175.179.94, OU=ses, O=ericsson, L=GZ, ST=GD, C=CN correct?
+  [no]:  y
+
+Enter key password for <esimproxy_server>
+	(RETURN if same as keystore password):  
+TestServer4:/var/tmp/att_simulators/caca # 
+
+
+2)    生成证书签名请求
+keytool -certreq -alias esimproxy_server -sigalg MD5withRSA -file esimproxy_server.csr -storepass 123456 -keystore esimproxy_keystore.jks
+
+3)    用CA私钥进行签名，也可以到权威机构申请CA签名。
+   openssl ca -in esimproxy_server.csr -out esimproxy_server.crt -cert ca.crt -keyfile ca.key -notext
+
+TestServer4:/var/tmp/att_simulators/caca # openssl ca -in esimproxy_server.csr -out esimproxy_server.crt -cert ca.crt -keyfile ca.key -notext
+Using configuration from /etc/ssl/openssl.cnf
+Enter pass phrase for ca.key:
+Check that the request matches the signature
+Signature ok
+Certificate Details:
+        Serial Number: 65537 (0x10001)
+        Validity
+            Not Before: Dec  7 17:14:54 2014 GMT
+            Not After : Dec  7 17:14:54 2015 GMT
+        Subject:
+            countryName               = CN
+            stateOrProvinceName       = GD
+            organizationName          = ericsson
+            organizationalUnitName    = ses
+            commonName                = 10.175.179.94
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Comment: 
+                OpenSSL Generated Certificate
+            X509v3 Subject Key Identifier: 
+                D9:27:E9:52:42:77:8F:8C:93:EF:28:49:5C:FD:C1:09:02:EC:85:83
+            X509v3 Authority Key Identifier: 
+                keyid:33:23:9C:9E:1E:7D:C5:11:A5:3A:A1:9D:E4:A5:42:04:99:60:69:85
+
+Certificate is to be certified until Dec  7 17:14:54 2015 GMT (365 days)
+Sign the certificate? [y/n]:y
+
+
+1 out of 1 certificate requests certified, commit? [y/n]y
+Write out database with 1 new entries
+Data Base Updated
+
+
+4)    导入信任的CA根证书到keystore
+   keytool -import -v -trustcacerts  -alias myca -file ca.crt -storepass 123456 -keystore esimproxy_keystore.jks
+
+5)    把CA签名后的server端证书导入keystore
+keytool -import -v -alias esimproxy_server -file esimproxy_server.crt -storepass 123456 -keystore esimproxy_keystore.jks
+有几个server就需要生成几个server端证书。
+
+
+
+ 
+4.    生成client端证书
+1)    生成客户端CSR
+   
+
+   openssl genrsa -des3  -out ses_client.key 1024
+
+TestServer4:/var/tmp/att_simulators/caca # openssl genrsa -des3  -out ses_client.key 1024
+Generating RSA private key, 1024 bit long modulus
+.......................++++++
+....++++++
+e is 65537 (0x10001)
+Enter pass phrase for ses_client.key:  wapwap12
+Verifying - Enter pass phrase for ses_client.key:
+
+   openssl req -new -key ses_client.key  -days 365 -out ses_client.csr 
+
+TestServer4:/var/tmp/att_simulators/caca # openssl req -new -key ses_client.key  -days 365 -out ses_client.csr 
+Enter pass phrase for ses_client.key:
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:CN
+State or Province Name (full name) [Some-State]:GD
+Locality Name (eg, city) []:GZ
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:ericsson
+Organizational Unit Name (eg, section) []:ses
+Common Name (eg, YOUR name) []:ses
+Email Address []:yang.s.shen@ericsson.com
+
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:
+An optional company name []:
+
+2)    用CA私钥进行签名
+openssl ca -in ses_client.csr -out ses_client.crt -cert ca.crt -keyfile ca.key -notext 
+
+3) openssl rsa -in ses_client.key -out ses_client_nopass.key
+4) openssl x509 -in ses_client.crt -out ses_client.cer
+
+
+
+test 
+1) openssl 
+openssl s_client -msg -connect 10.175.179.94:15542 -key ./ses_client.key -cert ./ses_client.cer -CApath ./ -CAfile ./ca.pem
+2) curl
+curl -i -X POST -d '{req:validateDeviceInfo}' https://10.175.179.94:15542/hongshan/validateDeviceInfo -v --key ses_client_nopass.key --cert ses_client.cer --capath ./ --cacert ca.pem
+
+test result:
+* About to connect() to 10.175.179.94 port 15542 (#0)
+*   Trying 10.175.179.94... connected
+* Connected to 10.175.179.94 (10.175.179.94) port 15542 (#0)
+* successfully set certificate verify locations:
+*   CAfile: ca.pem
+  CApath: ./
+* SSLv3, TLS handshake, Client hello (1):
+* SSLv3, TLS handshake, Server hello (2):
+* SSLv3, TLS handshake, CERT (11):
+* SSLv3, TLS handshake, Server key exchange (12):
+* SSLv3, TLS handshake, Request CERT (13):
+* SSLv3, TLS handshake, Server finished (14):
+* SSLv3, TLS handshake, CERT (11):
+* SSLv3, TLS handshake, Client key exchange (16):
+* SSLv3, TLS handshake, CERT verify (15):
+* SSLv3, TLS change cipher, Client hello (1):
+* SSLv3, TLS handshake, Finished (20):
+* SSLv3, TLS change cipher, Client hello (1):
+* SSLv3, TLS handshake, Finished (20):
+* SSL connection using EDH-RSA-DES-CBC3-SHA
+* Server certificate:
+* 	 subject: C=CN; ST=GD; O=ericsson; OU=ses; CN=10.175.179.94
+* 	 start date: 2016-06-16 02:51:24 GMT
+* 	 expire date: 2017-06-16 02:51:24 GMT
+* 	 common name: 10.175.179.94 (matched)
+* 	 issuer: C=CN; ST=GD; L=GZ; O=ericsson; OU=ses; CN=ca; emailAddress=hongshan.zhu@ericsson.com
+* 	 SSL certificate verify ok.
+> POST /hongshan/validateDeviceInfo HTTP/1.1
+> User-Agent: curl/7.19.7 (x86_64-suse-linux-gnu) libcurl/7.19.7 OpenSSL/0.9.8j zlib/1.2.7 libidn/1.10
+> Host: 10.175.179.94:15542
+> Accept: */*
+> Content-Length: 24
+> Content-Type: application/x-www-form-urlencoded
+> 
+< HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+< Content-Length: 1161
+Content-Length: 1161
+< Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=UTF-8
+
+< 
+<soapenv:Envelope xmlns:v1="http://www.ee.co.uk/external/apple/service/AppleSim/AppleSimResponse/v1" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><soapenv:Header/><soapenv:Body><v1:validateDeviceInfoResponse><message><!--Optional:--><notifications><!--1 or more repetitions:--><notification><code>validete_device_info_sucess</code><description>validate device info sucess</description></notification></notifications><!--Optional:--><imei>990000361082411</imei><!--Optional:--><meid>99000036108241</meid><csn>59010002000234f090bf7aca9dba826b</csn><!--Optional:--><serialNumber>1111</serialNumber><shouldRequireIccid>false</shouldRequireIccid><!--You have a CHOICE of the next 2 items at this level--><iccidPairing><!--1 or more repetitions:--><iccidPair><iccid>ts182_Ipad_iccid_old_2</iccid><!--Optional:--><pin>11</pin><iccidState>BOUND</iccidState><shouldRequireBind>false</shouldRequireBind></iccidPair><iccidPair><iccid>ts182_Ipad_iccid_old_3</iccid><pin>11</pin><iccidState>RESERVED</iccidState><shouldRequireBind>false</shouldRequireBind></iccidPair></iccidPairing></message></v1:validateDeviceInfoResponse></soapenv:Body></soapenv:Envelope>
+* Connection #0 to host 10.175.179.94 left intact
+* Closing connection #0
+* SSLv3, TLS alert, Client hello (1):
